@@ -4,6 +4,7 @@ import re
 RESULT_VAR = "Result"
 
 def quine_wrapper(n, minterms):
+    minterms = re.sub("\s+", "", minterms)
     prolog = Prolog()
     prolog.consult("quine")
     prolog.query("silent")
@@ -16,6 +17,5 @@ def quine_wrapper(n, minterms):
 
 if __name__ == "__main__":
     n = int(input("Enter number of variables: "))
-    minterms = input("Enter minterms (separated by comma ','): ")
-    minterms = re.sub("\s+", "", minterms)
+    minterms = input(f"Enter minterms ({0} - {2**n -1})(separated by comma ','): ")
     quine_wrapper(n, minterms)
