@@ -7,7 +7,7 @@ def quine_wrapper(n, minterms):
     prolog = Prolog()
     prolog.consult("quine")
     prolog.query("silent")
-    query = f"go({n}, '{minterms}', {RESULT_VAR})"
+    query = f"quine({n}, '{minterms}', {RESULT_VAR})"
     print(query)
     results = prolog.query(query)
     for result in results:
