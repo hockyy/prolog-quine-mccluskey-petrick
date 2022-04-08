@@ -1,3 +1,5 @@
+## Prolog Quine-Mccluskey Algorithm Implementation
+
 Just call the python function. It already has good UX.
 If you want to call it directly, use:
 ```prolog
