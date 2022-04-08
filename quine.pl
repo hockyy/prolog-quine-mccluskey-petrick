@@ -191,12 +191,16 @@ petrick(Minterms, PrimeImplicants, Result) :-
     flatten(TmpResult2, TmpResult3),
     list_to_set(TmpResult3, TmpResult4),
     sort(TmpResult4, CoveredMinterms),
+    
     findall(TmpVar, between(0, MintermsLengthMinusOne, TmpVar), AllTerms),
+    
     subtract(AllTerms, CoveredMinterms, UncoveredMinterms),
-    writeln(UncoveredMinterms),
+    
+    % writeln(UncoveredMinterms),
     length(UncoveredMinterms, UncoveredMintermsLength),
     UncoveredMintermsLengthMinusOne is UncoveredMintermsLength,
     UncoveredMintermsIndex in 0..UncoveredMintermsLengthMinusOne,
+    
     findall(RelatedImplicants,
         
         (
@@ -206,7 +210,7 @@ petrick(Minterms, PrimeImplicants, Result) :-
         
         Table
     ),
-    writeln(Table),
+    % writeln(Table),
     iterate_petrick(0, 0, Table, [], TmpResult5),
     sort_by_length(TmpResult5, TmpResult6),
     nth0(0, TmpResult6, BestIndices),
@@ -220,23 +224,26 @@ petrick(Minterms, PrimeImplicants, Result) :-
     writeln("Print Result:"),
     writeln(BestResults),
     append(BestResults, EssentialSet, Result).
-    % pairs_keys_values(ExtractedPrimeImplicantPairs, ExtractedPrimeImplicantKeys, ExtractedPrimeImplicantValues),
 
 quine(N, Minterms, Output) :-
     % Get TwoPower
     TwoPower is 2 ** N - 1,
+    
     % Split the minterms using comma
     split_string(Minterms, ",", ",", SubStrings),
+    
     % From strings to numbers
     maplist(number_string, Numbers, SubStrings),
+    
     % Asserts all the elements of minterms is between it
     maplist(call(between, 0, TwoPower), Numbers),
     NMinusOne is N - 1,
     maplist(call(number_binarylist, NMinusOne), Numbers, BinaryList),
+    
     % Output = BinaryList,
     iterate_quine(BinaryList, PrimeImplicants),
-    writeln(BinaryList),
-    writeln(PrimeImplicants),
-    writeln(""),
+    % writeln(BinaryList),
+    % writeln(PrimeImplicants),
+    % writeln(""),
     % halt,
     petrick(BinaryList, PrimeImplicants, Output).
