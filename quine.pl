@@ -130,20 +130,26 @@ petrick(Minterms, PrimeImplicants, Result) :-
             nth0(EssentialPrimeImplicantIndex, PrimeImplicants, EssentialPrimeImplicant)
         ),
         
-        EssentialPrimeImplicantsPairs
+        TmpResult1
     ),
+    list_to_set(TmpResult1, EssentialPrimeImplicantsPairs),
     pairs_keys_values(EssentialPrimeImplicantsPairs, EssentialPrimeImplicantsKeys, EssentialPrimeImplicantsValues),
     list_to_set(EssentialPrimeImplicantsValues, EssentialSet),
-    
-    % findall(ExtractedPrimeImplicantIndex-ExtractedPrimeImplicant,
+    findall(CoveredMinterm,
         
-    %     (
-    %         nth0(MintermsIndex, MatchMinterms, MatchMintermsElement),
-
-    %     ),
+        (
+            % This prime implicant is essential
+            member(PrimeImplicantsIndex, EssentialPrimeImplicantsKeys),
+            nth0(PrimeImplicantsIndex, MatchPrimeImplicants, MatchPrimeImplicantsElement),
+            pairs_keys_values([MatchPrimeImplicantsElement], _, [CoveredMinterm])
+        ),
         
-    %     ExtractedPrimeImplicantPairs
-    % ),
+        TmpResult2
+    ),
+    flatten(TmpResult2, TmpResult3),
+    sort(TmpResult4, CoveredMinterms),
+    list_to_set(TmpResult3, TmpResult4),
+    writeln(CoveredMinterms),
     % pairs_keys_values(ExtractedPrimeImplicantPairs, ExtractedPrimeImplicantKeys, ExtractedPrimeImplicantValues),
     Result = EssentialSet.
 
