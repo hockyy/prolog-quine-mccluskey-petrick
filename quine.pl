@@ -75,7 +75,7 @@ iterate_quine(BinaryList, Result) :-
     list_to_set(TemporaryResult, IterationResult),
     % writeln(IterationResult),
     % First iteration to find prime implicant is done
-    ((OnlyIndexSet = []) -> (
+    ((OnlyIndexSet = [] ; length(IterationResult, 1)) -> (
         Result = IterationResult
     );(
         iterate_quine(IterationResult, Result)    
@@ -151,7 +151,7 @@ petrick(Minterms, PrimeImplicants, Result) :-
         Match
     ),
 
-    writeln(Match),
+    % writeln(Match),
     pairs_keys_values(Match, TmpKeys, TmpValues),
     pairs_keys_values(TmpMatch, TmpValues, TmpKeys),
     keysort(TmpMatch, SwappedMatch),
@@ -159,9 +159,9 @@ petrick(Minterms, PrimeImplicants, Result) :-
     group_pairs_by_key(SwappedMatch, MatchPrimeImplicants),
     group_pairs_by_key(Match, MatchMinterms),
 
-    writeln(MatchMinterms),
-    writeln(MatchPrimeImplicants),
-    writeln(""),
+    % writeln(MatchMinterms),
+    % writeln(MatchPrimeImplicants),
+    % writeln(""),
 
     % Find essential prime implicants
     findall(EssentialPrimeImplicantIndex-EssentialPrimeImplicant,
@@ -222,8 +222,8 @@ petrick(Minterms, PrimeImplicants, Result) :-
         ),
         BestResults
     ),
-    writeln("Print Result:"),
-    writeln(BestResults),
+    % writeln("Print Result:"),
+    % writeln(BestResults),
     append(BestResults, EssentialSet, Result).
 
 quine(N, Minterms, Output) :-
