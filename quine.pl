@@ -147,9 +147,11 @@ petrick(Minterms, PrimeImplicants, Result) :-
         TmpResult2
     ),
     flatten(TmpResult2, TmpResult3),
-    sort(TmpResult4, CoveredMinterms),
     list_to_set(TmpResult3, TmpResult4),
-    writeln(CoveredMinterms),
+    sort(TmpResult4, CoveredMinterms),
+    findall(TmpVar, between(0, MintermsLengthMinusOne, TmpVar), AllTerms),
+    subtract(AllTerms, CoveredMinterms, UncoveredMinterms),
+    writeln(UncoveredMinterms),
     % pairs_keys_values(ExtractedPrimeImplicantPairs, ExtractedPrimeImplicantKeys, ExtractedPrimeImplicantValues),
     Result = EssentialSet.
 
