@@ -40,6 +40,7 @@ included_term([IndexA, IndexB, _, _], [IndexA, IndexB]).
 iterate_quine(BinaryList, Result) :-
     % maplist(is_minterms, BinaryList),
     length(BinaryList, MintermsLength),
+    % write(MintermsLength),
     MintermsLengthMinusOne is MintermsLength - 1,
     [X, Y] ins 0..MintermsLengthMinusOne,
     X #< Y,
@@ -49,12 +50,24 @@ iterate_quine(BinaryList, Result) :-
         nth0(Y, BinaryList, ElementY),
         diff_count(ElementX, ElementY, 1))
         ,UnifyableTerms),
-    write(UnifyableTerms),
+    % write(UnifyableTerms),
     maplist(unified_term, UnifyableTerms, Unified),
+
     maplist(included_term, UnifyableTerms, OnlyIndexUnflattened),
     flatten(OnlyIndexUnflattened, OnlyIndex),
+    % Find index that has been included in the unified terms
     list_to_set(OnlyIndex, OnlyIndexSet),
-    Result = OnlyIndexSet.
+    % Find minterms index that has not been unified
+
+    findall(A, between(0, MintermsLength, A), AllTerms),
+    subtract(AllTerms, OnlyIndexSet, NonUnifiedIndices),
+    findall(NonUnifiedBinaryList,
+        (member(NonUnifiedIndex, NonUnifiedIndices),
+        nth0(NonUnifiedIndex, BinaryList, NonUnifiedBinaryList)),
+        NonUnifiedBinaryLists),
+    write(BinaryList),
+    append(NonUnifiedBinaryLists, Unified, TemporaryResult),
+    Result = TemporaryResult.
 
 quine(N, Minterms, Output) :-
     % Get TwoPower
