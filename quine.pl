@@ -82,9 +82,11 @@ iterate_quine(BinaryList, Result) :-
     )).
 
 match_with_dontcares([],[]).
-match_with_dontcares([0 | List1], [0 | List2]) :- match_with_dontcares(List1, List2).
-match_with_dontcares([1 | List1], [1 | List2]) :- match_with_dontcares(List1, List2).
-match_with_dontcares([_ | List1], [2 | List2]) :- match_with_dontcares(List1, List2).
+match_with_dontcares([X | List1], [X | List2]) :-
+    match_with_dontcares(List1, List2).
+
+match_with_dontcares([_ | List1], [2 | List2]) :-
+    match_with_dontcares(List1, List2).
 
 petrick(Minterms, PrimeImplicants, Result) :-
     % For each minterms, determine who is the prime implicants
@@ -96,6 +98,8 @@ petrick(Minterms, PrimeImplicants, Result) :-
     PrimeImplicantsLengthMinusOne is PrimeImplicantsLength - 1,
     MintermsIndex in 0..MintermsLengthMinusOne,
     PrimeImplicantsIndex in 0..PrimeImplicantsLengthMinusOne,
+
+    % Make the pairs of coordinate of the petrick table, group by the prime implicants
     findall(MintermsIndex-PrimeImplicantsIndex,
         
         (nth0(MintermsIndex, Minterms, MintermsElement),
@@ -104,21 +108,43 @@ petrick(Minterms, PrimeImplicants, Result) :-
         
         Match
     ),
+
+    writeln(Match),
+    pairs_keys_values(Match, TmpKeys, TmpValues),
+    pairs_keys_values(TmpMatch, TmpValues, TmpKeys),
+    keysort(TmpMatch, SwappedMatch),
+    
+    group_pairs_by_key(SwappedMatch, MatchPrimeImplicants),
     group_pairs_by_key(Match, MatchMinterms),
-    % Find essential prime implicants
+
     writeln(MatchMinterms),
-    findall(EssentialPrimeImplicant,
+    writeln(MatchPrimeImplicants),
+    writeln(""),
+
+    % Find essential prime implicants
+    findall(EssentialPrimeImplicantIndex-EssentialPrimeImplicant,
         
         (
             nth0(MintermsIndex, MatchMinterms, MatchMintermsElement),
-            writeln(MatchMintermsElement),
             pairs_keys_values([MatchMintermsElement], _, [[EssentialPrimeImplicantIndex]]),
             nth0(EssentialPrimeImplicantIndex, PrimeImplicants, EssentialPrimeImplicant)
         ),
         
-        EssentialPrimeImplicants
+        EssentialPrimeImplicantsPairs
     ),
-    list_to_set(EssentialPrimeImplicants, EssentialSet),
+    pairs_keys_values(EssentialPrimeImplicantsPairs, EssentialPrimeImplicantsKeys, EssentialPrimeImplicantsValues),
+    list_to_set(EssentialPrimeImplicantsValues, EssentialSet),
+    
+    % findall(ExtractedPrimeImplicantIndex-ExtractedPrimeImplicant,
+        
+    %     (
+    %         nth0(MintermsIndex, MatchMinterms, MatchMintermsElement),
+
+    %     ),
+        
+    %     ExtractedPrimeImplicantPairs
+    % ),
+    % pairs_keys_values(ExtractedPrimeImplicantPairs, ExtractedPrimeImplicantKeys, ExtractedPrimeImplicantValues),
     Result = EssentialSet.
 
 quine(N, Minterms, Output) :-
@@ -133,7 +159,8 @@ quine(N, Minterms, Output) :-
     maplist(call(number_binarylist, N - 1), Numbers, BinaryList),
     % Output = BinaryList,
     iterate_quine(BinaryList, PrimeImplicants),
-    write(BinaryList),
-    write(PrimeImplicants),
+    writeln(BinaryList),
+    writeln(PrimeImplicants),
+    writeln(""),
     % halt,
     petrick(BinaryList, PrimeImplicants, Output).
