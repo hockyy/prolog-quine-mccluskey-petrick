@@ -1,5 +1,6 @@
 % :- set_prolog_flag(verbose, silent).
 :- use_module(library(clpfd)).
+:- use_module(library(pairs)).
 
 % Base case is when the length is enough
 number_binarylist(-1, _, []).
@@ -101,10 +102,24 @@ petrick(Minterms, PrimeImplicants, Result) :-
         nth0(PrimeImplicantsIndex, PrimeImplicants, PrimeImplicantsElement),
         match_with_dontcares(MintermsElement, PrimeImplicantsElement)),
         
-        Match),
+        Match
+    ),
     group_pairs_by_key(Match, MatchMinterms),
-    
-    Result = MatchMinterms.
+    % Find essential prime implicants
+    writeln(MatchMinterms),
+    findall(EssentialPrimeImplicant,
+        
+        (
+            nth0(MintermsIndex, MatchMinterms, MatchMintermsElement),
+            writeln(MatchMintermsElement),
+            pairs_keys_values([MatchMintermsElement], _, [[EssentialPrimeImplicantIndex]]),
+            nth0(EssentialPrimeImplicantIndex, PrimeImplicants, EssentialPrimeImplicant)
+        ),
+        
+        EssentialPrimeImplicants
+    ),
+    list_to_set(EssentialPrimeImplicants, EssentialSet),
+    Result = EssentialSet.
 
 quine(N, Minterms, Output) :-
     % Get TwoPower
