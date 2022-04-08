@@ -11,9 +11,20 @@ def quine_wrapper(n, minterms):
     query = f"quine({n}, '{minterms}', {RESULT_VAR})"
     print(query)
     results = prolog.query(query)
+
     for result in results:
-        print(result[RESULT_VAR])
+        prime_implicants = result[RESULT_VAR]
         break
+    
+    BASE_ORD = ord('A')
+
+    for implicant_idx, prime_implicant in enumerate(prime_implicants):
+        term = ""
+        for index, val in enumerate(prime_implicant):
+            if(val == 2): continue
+            term += chr(index + BASE_ORD)
+            if not val: term += "'"
+        print(term, end = ('+' if implicant_idx != len(prime_implicants) - 1 else ''))
 
 if __name__ == "__main__":
     n = int(input("Enter number of variables: "))
