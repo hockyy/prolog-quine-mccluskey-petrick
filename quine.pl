@@ -16,6 +16,20 @@ diff_count([X | List1], [Y | List2], Result) :-
     diff_count(List1, List2, NextResult),
     ((X \= Y) -> (Result is NextResult + 1); (Result is NextResult)).
 
+iterate_quine(BinaryList, Result) :-
+    length(BinaryList, MintermsLength),
+    MintermsLengthMinusOne is MintermsLength - 1,
+    [X, Y] ins 0..MintermsLengthMinusOne,
+    X #< Y,
+
+
+    findall([X, Y, ElementX, ElementY],
+        (nth0(X, BinaryList, ElementX),
+        nth0(Y, BinaryList, ElementY),
+        diff_count(ElementX, ElementY, 1))
+        ,Result).
+
+
 quine(N, Minterms, Output) :-
     % Get TwoPower
     TwoPower is 2 ** N - 1,
@@ -27,14 +41,5 @@ quine(N, Minterms, Output) :-
     maplist(call(between, 0, TwoPower), Numbers),
     maplist(call(number_binarylist, N - 1), Numbers, BinaryList),
     % Output = BinaryList,
-    length(BinaryList, MintermsLength),
-    MintermsLengthMinusOne is MintermsLength - 1,
-    [X, Y] ins 0..MintermsLengthMinusOne,
-    X #< Y,
-    % X is 0,
-    % Y is 1,
-    nth0(X, BinaryList, ElementX),
-    nth0(Y, BinaryList, ElementY),
-
-    diff_count(ElementX, ElementY, 1),
-    Output = [X, Y].
+    
+    iterate_quine(BinaryList, Output).
