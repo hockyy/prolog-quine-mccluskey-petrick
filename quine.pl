@@ -88,6 +88,16 @@ match_with_dontcares([X | List1], [X | List2]) :-
 match_with_dontcares([_ | List1], [2 | List2]) :-
     match_with_dontcares(List1, List2).
 
+iterate_petrick(MintermPosition, ImplicantPosition, Table, Result) :-
+    length(Table, MintermsLength),
+    ((MintermsLength = MintermPosition) -> (Result = [], !);(
+        nth0(ImplicantPosition, Table, Implicants),
+        length(Implicants, ImplicantsLength),
+        ((ImplicantPosition = ImplicantsLength)->( Result = [], !);(
+            Result = []
+        ))
+    )).
+
 petrick(Minterms, PrimeImplicants, Result) :-
     % For each minterms, determine who is the prime implicants
     % Generate list of list, the MatchMinterms[X][Y] means 
@@ -152,6 +162,20 @@ petrick(Minterms, PrimeImplicants, Result) :-
     findall(TmpVar, between(0, MintermsLengthMinusOne, TmpVar), AllTerms),
     subtract(AllTerms, CoveredMinterms, UncoveredMinterms),
     writeln(UncoveredMinterms),
+    length(UncoveredMinterms, UncoveredMintermsLength),
+    UncoveredMintermsLengthMinusOne is UncoveredMintermsLength,
+    UncoveredMintermsIndex in 0..UncoveredMintermsLengthMinusOne,
+    findall(RelatedImplicants,
+        
+        (
+            nth0(UncoveredMintermsIndex, UncoveredMinterms, UncoveredMintermsElement),
+            nth0(UncoveredMintermsElement, MatchMinterms, RelatedImplicants)
+        ),
+        
+        Table
+    ),
+    writeln(Table),
+    iterate_petrick(0, 0, Table, TmpResult5),
     % pairs_keys_values(ExtractedPrimeImplicantPairs, ExtractedPrimeImplicantKeys, ExtractedPrimeImplicantValues),
     Result = EssentialSet.
 
