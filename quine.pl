@@ -88,15 +88,47 @@ match_with_dontcares([X | List1], [X | List2]) :-
 match_with_dontcares([_ | List1], [2 | List2]) :-
     match_with_dontcares(List1, List2).
 
-iterate_petrick(MintermPosition, ImplicantPosition, Table, Result) :-
+insert_sort(X, L1, L2) :-
+    (member(X, L1)) -> (L2 = L1);(insert_sorted(X, L1, L2)).
+insert_sorted(X, [], [X]) :- !.
+insert_sorted(X, [X1|L1], [X, X1|L1]):- X =< X1, !.
+insert_sorted(X, [X1|L1], [X1|L]):- insert_sorted(X, L1, L).
+
+iterate_petrick(MintermPosition, ImplicantPosition, Table, Accumulator, Result) :-
+    % writeln("--"),
+    % writeln(MintermPosition),
+    % writeln(ImplicantPosition),
+    % writeln(Table),
+    % writeln(Accumulator),
     length(Table, MintermsLength),
-    ((MintermsLength = MintermPosition) -> (Result = [], !);(
-        nth0(ImplicantPosition, Table, Implicants),
+    % writeln(MintermsLength),
+    ((MintermsLength = MintermPosition) -> (Result = [Accumulator], !);(
+        nth0(MintermPosition, Table, TmpImplicants),
+        pairs_keys_values([TmpImplicants], _, [Implicants]),
         length(Implicants, ImplicantsLength),
         ((ImplicantPosition = ImplicantsLength)->( Result = [], !);(
-            Result = []
+            % Whether takes the current implicant, and go next, or checkout other possible implicant
+            nth0(ImplicantPosition, Implicants, ImplicantElement),
+            % writeln(Implicants),
+            % writeln(ImplicantElement),
+            insert_sort(ImplicantElement, Accumulator, NextAccumulator),
+            NextMinterm is MintermPosition + 1,
+            iterate_petrick(NextMinterm, 0, Table, NextAccumulator, TmpResult),
+            % !,
+            % Checkout the others
+            NextImplicant is ImplicantPosition + 1,
+            iterate_petrick(MintermPosition, NextImplicant, Table, Accumulator, TmpResult1),
+            append(TmpResult, TmpResult1, TmpResult2),
+            list_to_set(TmpResult2, Result)
         ))
     )).
+
+key_pair_list_with_length(L,N-L) :- length(L, N).
+
+sort_by_length(L, Sorted) :-
+    maplist(key_pair_list_with_length, L, KVs),
+    keysort(KVs, TmpResult),
+    pairs_keys_values(TmpResult, _, Sorted).
 
 petrick(Minterms, PrimeImplicants, Result) :-
     % For each minterms, determine who is the prime implicants
@@ -175,9 +207,20 @@ petrick(Minterms, PrimeImplicants, Result) :-
         Table
     ),
     writeln(Table),
-    iterate_petrick(0, 0, Table, TmpResult5),
+    iterate_petrick(0, 0, Table, [], TmpResult5),
+    sort_by_length(TmpResult5, TmpResult6),
+    nth0(0, TmpResult6, BestIndices),
+    findall(BestResult,
+        (
+            member(PrimeImplicantsIndex, BestIndices),            
+            nth0(PrimeImplicantsIndex, PrimeImplicants, BestResult)
+        ),
+        BestResults
+    ),
+    writeln("Print Result:"),
+    writeln(BestResults),
+    append(BestResults, EssentialSet, Result).
     % pairs_keys_values(ExtractedPrimeImplicantPairs, ExtractedPrimeImplicantKeys, ExtractedPrimeImplicantValues),
-    Result = EssentialSet.
 
 quine(N, Minterms, Output) :-
     % Get TwoPower
@@ -188,7 +231,8 @@ quine(N, Minterms, Output) :-
     maplist(number_string, Numbers, SubStrings),
     % Asserts all the elements of minterms is between it
     maplist(call(between, 0, TwoPower), Numbers),
-    maplist(call(number_binarylist, N - 1), Numbers, BinaryList),
+    NMinusOne is N - 1,
+    maplist(call(number_binarylist, NMinusOne), Numbers, BinaryList),
     % Output = BinaryList,
     iterate_quine(BinaryList, PrimeImplicants),
     writeln(BinaryList),
