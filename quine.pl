@@ -213,6 +213,7 @@ petrick(Minterms, PrimeImplicants, Result) :-
     % writeln(Table),
     iterate_petrick(0, 0, Table, [], TmpResult5),
     sort_by_length(TmpResult5, TmpResult6),
+    
     nth0(0, TmpResult6, BestIndices),
     findall(BestResult,
         (
