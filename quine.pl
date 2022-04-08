@@ -38,6 +38,7 @@ included_term([IndexA, IndexB, _, _], [IndexA, IndexB]).
 % Iterate quine will receive a list of minterms object.
 % minterms object 
 iterate_quine(BinaryList, Result) :-
+    % writeln(BinaryList),
     % maplist(is_minterms, BinaryList),
     length(BinaryList, MintermsLength),
     % write(MintermsLength),
@@ -65,9 +66,19 @@ iterate_quine(BinaryList, Result) :-
         (member(NonUnifiedIndex, NonUnifiedIndices),
         nth0(NonUnifiedIndex, BinaryList, NonUnifiedBinaryList)),
         NonUnifiedBinaryLists),
-    write(BinaryList),
+    
+    % Append the non unified and the unified binary list.
     append(NonUnifiedBinaryLists, Unified, TemporaryResult),
-    Result = TemporaryResult.
+    
+    % Make sure no duplicate is encountered
+    list_to_set(TemporaryResult, IterationResult),
+    % writeln(IterationResult),
+    % First iteration to find prime implicant is done
+    ((OnlyIndexSet = []) -> (
+        Result = IterationResult
+    );(
+        iterate_quine(IterationResult, Result)    
+    )).
 
 quine(N, Minterms, Output) :-
     % Get TwoPower
