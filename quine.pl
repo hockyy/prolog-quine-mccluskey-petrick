@@ -80,6 +80,32 @@ iterate_quine(BinaryList, Result) :-
         iterate_quine(IterationResult, Result)    
     )).
 
+match_with_dontcares([],[]).
+match_with_dontcares([0 | List1], [0 | List2]) :- match_with_dontcares(List1, List2).
+match_with_dontcares([1 | List1], [1 | List2]) :- match_with_dontcares(List1, List2).
+match_with_dontcares([_ | List1], [2 | List2]) :- match_with_dontcares(List1, List2).
+
+petrick(Minterms, PrimeImplicants, Result) :-
+    % For each minterms, determine who is the prime implicants
+    % Generate list of list, the MatchMinterms[X][Y] means 
+    % Minterms[X] is matched by the PrimeImplicants[Y]
+    length(Minterms, MintermsLength),
+    MintermsLengthMinusOne is MintermsLength - 1,
+    length(PrimeImplicants, PrimeImplicantsLength),
+    PrimeImplicantsLengthMinusOne is PrimeImplicantsLength - 1,
+    MintermsIndex in 0..MintermsLengthMinusOne,
+    PrimeImplicantsIndex in 0..PrimeImplicantsLengthMinusOne,
+    findall(MintermsIndex-PrimeImplicantsIndex,
+        
+        (nth0(MintermsIndex, Minterms, MintermsElement),
+        nth0(PrimeImplicantsIndex, PrimeImplicants, PrimeImplicantsElement),
+        match_with_dontcares(MintermsElement, PrimeImplicantsElement)),
+        
+        Match),
+    group_pairs_by_key(Match, MatchMinterms),
+    
+    Result = MatchMinterms.
+
 quine(N, Minterms, Output) :-
     % Get TwoPower
     TwoPower is 2 ** N - 1,
@@ -91,4 +117,8 @@ quine(N, Minterms, Output) :-
     maplist(call(between, 0, TwoPower), Numbers),
     maplist(call(number_binarylist, N - 1), Numbers, BinaryList),
     % Output = BinaryList,
-    iterate_quine(BinaryList, Output).
+    iterate_quine(BinaryList, PrimeImplicants),
+    write(BinaryList),
+    write(PrimeImplicants),
+    % halt,
+    petrick(BinaryList, PrimeImplicants, Output).
