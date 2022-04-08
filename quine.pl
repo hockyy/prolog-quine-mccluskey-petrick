@@ -39,6 +39,7 @@ included_term([IndexA, IndexB, _, _], [IndexA, IndexB]).
 % Iterate quine will receive a list of minterms object.
 % minterms object 
 iterate_quine(BinaryList, Result) :-
+    (length(BinaryList, 1)) -> (Result = BinaryList, !);
     % writeln(BinaryList),
     % maplist(is_minterms, BinaryList),
     length(BinaryList, MintermsLength),
@@ -75,7 +76,7 @@ iterate_quine(BinaryList, Result) :-
     list_to_set(TemporaryResult, IterationResult),
     % writeln(IterationResult),
     % First iteration to find prime implicant is done
-    ((OnlyIndexSet = [] ; length(IterationResult, 1)) -> (
+    ((OnlyIndexSet = []) -> (
         Result = IterationResult
     );(
         iterate_quine(IterationResult, Result)    
