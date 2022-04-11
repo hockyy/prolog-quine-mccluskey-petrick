@@ -36,8 +36,8 @@ int main() {
     cout << "[";
     for(int j = 0;j < varn;j++) {
       char cur = (char) (j + 'a');
-      if((curterm>>j)&i) cout << "";
-      else cout << "~";
+      if((curterm>>j)&i) cout << "~";
+      else cout << "";
       cout << cur;
       cout << ",]"[j == varn - 1];
     }
