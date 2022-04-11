@@ -4,6 +4,7 @@
 
 % Base case is when the length is enough
 number_binarylist(-1, _, []).
+% Convert Number into binary digits with length Length
 number_binarylist(Length, Number, BinaryList) :-
     Length > -1,  
     NextLength is Length - 1,

@@ -17,6 +17,7 @@ int main() {
   const double HIGH = 0.75;
   cout << "Insert number of variables: ";
   long long n; cin >> n;
+  long long varn = n;
   n = (1LL << n);
   int low = max(1LL, (LL)(LOW * n));
   int high = min(n, (LL)(HIGH * n));
@@ -29,5 +30,18 @@ int main() {
   for(int i = 0;i < numberOfTerms;i++){
     cout << allTerms[i] << ",\n"[i == numberOfTerms - 1];
   }
-  cout << endl;
+  cout << "minimize_clauseset([";
+  for(int i = 0;i < numberOfTerms;i++) {
+    LL curterm = allTerms[i];
+    cout << "[";
+    for(int j = 0;j < varn;j++) {
+      char cur = (char) (j + 'a');
+      if((curterm>>j)&i) cout << "";
+      else cout << "~";
+      cout << cur;
+      cout << ",]"[j == varn - 1];
+    }
+    cout << ",]"[i == numberOfTerms - 1];
+  }
+  cout << ", M)." << endl;
 }
